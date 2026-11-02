@@ -6,12 +6,31 @@ Ce journal consigne de manière chronologique les séances de travail, les objec
 
 ## Synthèse du Temps Consommé
 - **Total prévu :** 130 heures
-- **Temps cumulé à ce jour :** 2.0 heures
-- **Temps restant :** 128.0 heures
+- **Temps cumulé à ce jour :** 3.5 heures
+- **Temps restant :** 126.5 heures
 
 ---
 
 ## Entrées du Journal
+
+### Séance 02 — Conception BDD & Début PoC Dockerode
+- **Date :** 02.11.2026
+- **Durée effective :** 1h30
+- **Phases :** Phase 3 (Conception - 0h30) et Phase 2 (PoC - 1h00)
+- **Travail réalisé :**
+  - Modélisation du MCD et génération du MLD avec le logiciel Looping dans `doc/conception/`.
+  - Correction des cardinalités Merise (passage à `1,1` pour `User ↔ Instance` et `0,1` pour `User ↔ AuditLog`).
+  - Configuration de l'environnement TypeScript moderne avec `tsx` (résolution de l'incompatibilité Node v24).
+  - Écriture autonome par l'apprenti du premier script `poc/poc-docker/index.ts` en TypeScript avec `async/await`.
+  - Test réussi de connexion à Docker Desktop, listage des conteneurs, téléchargement de l'image `alpine` et premier démarrage de conteneur en code TypeScript.
+- **Difficultés rencontrées / Notions acquises :**
+  - Transition du style "callback hell" vers la syntaxe moderne "async/await".
+  - Compréhension de l'unicité des noms de conteneurs dans Docker Engine (erreur HTTP 409 en cas de réutilisation).
+- **Prochaine étape :**
+  - Implémentation de l'arrêt (`stop`) et de la suppression (`remove`) automatique.
+  - Ajout des contraintes de sécurité cgroups (`Memory`, `PidsLimit: 100`).
+
+---
 
 ### Séance 01 — Initialisation & Cadrage
 - **Date :** 02.11.2026
