@@ -1,0 +1,4 @@
+# Dossier de prototypes (Proof of Concept)
+Ce dossier contiendra nos scripts d'apprentissage et de tests isolés :
+- `poc-docker/` : Premiers pas avec Dockerode
+- `poc-websocket/` : Premiers pas avec WebSockets et flux xterm

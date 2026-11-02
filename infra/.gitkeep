@@ -1,0 +1,6 @@
+# Dossier Infrastructure
+Ce dossier contiendra les Dockerfiles des environnements d'apprentissage :
+- `templates/alpine/`
+- `templates/python/`
+- `templates/mariadb/`
+- Scripts de création du réseau isolé Docker
