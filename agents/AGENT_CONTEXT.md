@@ -33,35 +33,43 @@ Portail Self-Service de conteneurs d'apprentissage Docker légers avec terminal 
 
 ## 3. État d'Avancement Actuel
 
-### Total consommé : 3.5 h / 130 h (Reste : 126.5 h)
+### Total consommé : 6.0 h / 130 h (Reste : 124.0 h)
 - **Phase 1 (Analyse & Cadrage) :** 2.0 h
-  - Structure Git monorepo initialisée (`d:\P_Prod\LabBox`).
+  - Structure Git monorepo initialisée (`e:\P_Prod\LabBox`).
   - Dépôt distant GitHub : `https://github.com/b1t3zzZ/LabBox.git` (branche `main`).
   - Cahier des charges avec 8 User Stories rédigé (`doc/cahier_des_charges.md`).
-  - Journal de bord et planning prévisionnel initialisés (`doc/journal_de_bord.md`, `doc/planning.md`).
+  - Journal de bord, planning et brouillon du rapport technique initialisés (`doc/journal_de_bord.md`, `doc/planning.md`, `doc/rapport.md`).
 - **Phase 3 (Conception BDD — anticipée) :** 0.5 h
   - Modèle Conceptuel (MCD) et Modèle Logique (MLD) créés par l'apprenti avec Looping (`doc/conception/`). 4 tables : `User`, `Template`, `Instance`, `AuditLog`. Cardinalités corrigées et validées.
-- **Phase 2 (Bacs à sable / PoC) :** 1.0 h (En cours)
-  - Dossier `poc/poc-docker/` créé avec TypeScript et `tsx`.
-  - Connexion au Docker Socket Windows réussie.
-  - **L'apprenti a écrit lui-même** le code de connexion, de listage des conteneurs (`docker.listContainers`), de création (`docker.createContainer`) avec l'image `alpine` et de démarrage (`container.start()`).
-  - Notion comprise : unicité des noms de conteneurs Docker et gestion du cycle de vie (création vs suppression).
+- **Phase 2 (Bacs à sable / PoC & Infrastructure portable) :** 3.5 h (En cours)
+  - **PoC 1 (`poc/poc-docker/`) — TERMINÉ :**
+    - Cycle de vie complet en `async/await` (`listContainers`, `createContainer`, `start`, pause, `inspect`, `stop`, `remove`).
+    - Limites `HostConfig` implémentées par l'apprenti : `Memory: 268435456`, `NanoCpus: 500000000`, `PidsLimit: 100`.
+    - Constatation technique importante pour le rapport : sur le poste Windows avec Docker Desktop 4.10.0 + WSL2 kernel 6.18 (`cgroupfs v1`), `docker info` signale `WARNING: No memory limit support`, donc `Memory` retourne `0` localement alors que `NanoCpus` et `PidsLimit` sont bien appliqués (ceci sera pleinement actif sur le serveur Linux / VM `LabBox-Linux`).
+  - **Diagnostic d'infrastructure sur les postes ETML (`OptiPlex 7010`) :**
+    - Les postes scolaires n'ont pas WSL installé par défaut et bloquent l'installation sans droits administrateur.
+    - Une VM Windows 11 (`LabBox-Docker`) sous VirtualBox ne peut pas exécuter Docker Desktop/WSL 2 car la sécurité Windows de l'hôte (`HypervisorPresent: True` / VBS) empêche la virtualisation imbriquée (`Nested virtualization is not available`).
+  - **Mise en place d'une VM Linux portable (`LabBox-Linux`) sur le disque externe :**
+    - Téléchargement de `alpine-virt-3.21.3-x86_64.iso` (63 Mo) dans `ISO/`.
+    - Création et configuration de la VM VirtualBox `LabBox-Linux` (2 Go RAM, 2 CPU, disque 8 Go, contrôleur graphique `VBoxVGA`).
+    - Configuration des redirections de ports NAT : `127.0.0.1:2375 -> 2375` (API Docker TCP) et `127.0.0.1:2222 -> 22` (SSH).
+    - Mise à jour de `.gitignore` pour exclure les dossiers lourds (`ISO/`, `LabBox-Docker/`, `LabBox-Linux/`, `*.iso`, `*.vdi`, `*.vbox*`).
 
 ---
 
 ## 4. Ce Qu'il Faut Faire Immédiatement (Prochaine séance)
-1. **Terminer le PoC 1 (Cycle de vie & Sécurité dans Dockerode) :**
-   - Implémenter le nettoyage automatique dans `index.ts` : temporisation de 5 secondes, arrêt (`await container.stop()`) et suppression (`await container.remove()`).
-   - Tester l'application des limites de sécurité **cgroups** lors du `createContainer` :
-     - `HostConfig: { Memory: 256 * 1024 * 1024, NanoCpus: 500000000, PidsLimit: 100 }`.
-2. **Démarrer le PoC 2 (WebSocket & xterm.js) :**
-   - Transmettre un flux interactif de shell (stdin/stdout) depuis le conteneur Docker vers un terminal web.
-3. **Mettre à jour le Journal de bord (`doc/journal_de_bord.md`) et commiter sur Git.**
+1. **Démarrer le PoC 2 (`poc/poc-websocket/` — WebSocket & xterm.js) :**
+   - Initialiser `poc/poc-websocket/` avec TypeScript, `tsx`, `ws`, `@types/ws`, `dockerode`.
+   - Comprendre le concept de `attach` / `exec` en stream bidirectionnel (`stdin` / `stdout`) sur un conteneur Docker.
+   - Connecter un mini serveur WebSocket à un conteneur `alpine` (`sh`) puis afficher un terminal interactif `xterm.js` dans une page HTML simple.
+2. **Finaliser `LabBox-Linux` (quand sur poste ETML sans Docker Desktop) :**
+   - Terminer l'installation d'Alpine + Docker TCP `0.0.0.0:2375` si besoin sur les PC scolaires.
 
 ---
 
 ## 5. Commandes Utiles & Astuces Environnement
 - **Lancer un script TypeScript :** `npx.cmd tsx <fichier.ts>`
+- **Docker via VM Linux (`LabBox-Linux`) :** `new Docker({ host: '127.0.0.1', port: 2375 })`
 - **Docker Socket Windows :** `//./pipe/docker_engine`
 - **Docker Socket Linux :** `/var/run/docker.sock`
 - **Gestion des scripts PowerShell bridés :** Toujours utiliser `npm.cmd` et `npx.cmd` au lieu de `npm`/`npx`.

@@ -35,3 +35,13 @@ pnpm-debug.log*
 *.log
 tmp/
 temp/
+
+
+# Virtual Machines & ISO images
+ISO/
+LabBox-Docker/
+*.iso
+*.vdi
+*.vbox
+*.vbox-prev
+LabBox-Linux/
